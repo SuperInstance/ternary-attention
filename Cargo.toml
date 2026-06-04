@@ -1,0 +1,6 @@
+[package]
+name = "ternary-attention"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Attention mechanisms adapted for ternary inputs on {-1, 0, +1}"
