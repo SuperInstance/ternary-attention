@@ -123,6 +123,14 @@ The attention pattern type provides analysis tools: `argmax_per_row` shows the m
 | `ternary-cell` | Cell signal propagation is a form of local attention |
 | `ternary-quantum` | Qutrit gates use similar matrix operations |
 
+## Known Limitations
+
+- **Attention weights are fixed (non-learnable).** The `ternary_to_dense` projection is deterministic — there are no trainable parameters. This is a *simulation* of attention, not a model that can be trained via backpropagation.
+- **No gradient computation or backpropagation.** The crate cannot be used for training transformer models.
+- **Multi-head attention sees scaled copies of the same information.** Since all heads derive from the same fixed `ternary_to_dense` mapping, the multi-head structure doesn't provide the representational diversity of learned attention heads.
+- **`masked_attention` uses `f64::NEG_INFINITY / 2.0` as a validity threshold.** This hack could produce incorrect results with sufficiently negative actual scores.
+- **No batch dimension.** All operations work on single sequences only.
+
 ## License
 
 MIT
