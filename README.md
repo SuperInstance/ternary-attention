@@ -134,3 +134,11 @@ The attention pattern type provides analysis tools: `argmax_per_row` shows the m
 ## License
 
 MIT
+
+## See Also
+- **ternary-cortex** — related
+- **ternary-transform** — related
+- **ternary-language-model** — related
+- **ternary-entropy** — related
+- **ternary-signals** — related
+
