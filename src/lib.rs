@@ -7,30 +7,26 @@
 
 
 
-/// A ternary value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Ternary {
-    Neg,
-    Zero,
-    Pos,
+/// Canonical ternary type re-exported from `ternary-types`.
+pub use ternary_types::Ternary;
+
+/// Extension trait providing methods previously on the custom `Ternary` type.
+pub trait TernaryExt {
+    /// Convert this ternary value to `f64`.
+    fn to_f64(self) -> f64;
+    /// Create a `Ternary` from an `i8` value (-1, 0, or 1).
+    fn from_i8(v: i8) -> Option<Self>
+    where
+        Self: Sized;
 }
 
-impl Ternary {
-    pub fn to_f64(self) -> f64 {
-        match self {
-            Ternary::Neg => -1.0,
-            Ternary::Zero => 0.0,
-            Ternary::Pos => 1.0,
-        }
+impl TernaryExt for ternary_types::Ternary {
+    fn to_f64(self) -> f64 {
+        i8::from(self) as f64
     }
 
-    pub fn from_i8(v: i8) -> Option<Self> {
-        match v {
-            -1 => Some(Ternary::Neg),
-            0 => Some(Ternary::Zero),
-            1 => Some(Ternary::Pos),
-            _ => None,
-        }
+    fn from_i8(v: i8) -> Option<Self> {
+        Self::try_from(v).ok()
     }
 }
 
@@ -462,7 +458,7 @@ mod tests {
     #[test]
     fn test_ternary_attention_self() {
         let attn = TernaryAttention::new(4);
-        let seq = vec![Ternary::Neg, Ternary::Zero, Ternary::Pos];
+        let seq = vec![Ternary::Negative, Ternary::Neutral, Ternary::Positive];
         let (output, weights) = attn.self_attention(&seq);
         assert_eq!(output.len(), 3);
         assert_eq!(weights.len(), 3);
@@ -476,7 +472,7 @@ mod tests {
     #[test]
     fn test_multi_head_attention() {
         let mha = MultiHeadAttention::new(2, 4);
-        let seq = vec![Ternary::Neg, Ternary::Zero, Ternary::Pos, Ternary::Pos];
+        let seq = vec![Ternary::Negative, Ternary::Neutral, Ternary::Positive, Ternary::Positive];
         let (output, head_weights) = mha.forward(&seq);
         assert_eq!(output.len(), 4);
         assert_eq!(output[0].len(), 4);
@@ -486,8 +482,8 @@ mod tests {
     #[test]
     fn test_cross_attention() {
         let ca = CrossAttention::new(4);
-        let source = vec![Ternary::Neg, Ternary::Pos];
-        let target = vec![Ternary::Zero, Ternary::Pos, Ternary::Neg];
+        let source = vec![Ternary::Negative, Ternary::Positive];
+        let target = vec![Ternary::Neutral, Ternary::Positive, Ternary::Negative];
         let (output, weights) = ca.forward(&source, &target);
         assert_eq!(output.len(), 2);
         assert_eq!(weights[0].len(), 3);
@@ -527,12 +523,12 @@ mod tests {
 
     #[test]
     fn test_ternary_compatibility() {
-        let q = vec![Ternary::Pos, Ternary::Pos];
-        let k = vec![Ternary::Pos, Ternary::Pos];
+        let q = vec![Ternary::Positive, Ternary::Positive];
+        let k = vec![Ternary::Positive, Ternary::Positive];
         let score = ternary_compatibility(&q, &k);
         assert!((score - 1.0).abs() < 1e-10);
 
-        let k2 = vec![Ternary::Neg, Ternary::Neg];
+        let k2 = vec![Ternary::Negative, Ternary::Negative];
         let score2 = ternary_compatibility(&q, &k2);
         assert!((score2 - (-1.0)).abs() < 1e-10);
     }
@@ -550,7 +546,7 @@ mod tests {
 
     #[test]
     fn test_ternary_to_dense() {
-        let seq = vec![Ternary::Pos];
+        let seq = vec![Ternary::Positive];
         let dense = ternary_to_dense(&seq, 3);
         assert_eq!(dense.len(), 1);
         assert_eq!(dense[0].len(), 3);
@@ -569,9 +565,9 @@ mod tests {
 
     #[test]
     fn test_ternary_from_i8() {
-        assert_eq!(Ternary::from_i8(-1), Some(Ternary::Neg));
-        assert_eq!(Ternary::from_i8(0), Some(Ternary::Zero));
-        assert_eq!(Ternary::from_i8(1), Some(Ternary::Pos));
+        assert_eq!(Ternary::from_i8(-1), Some(Ternary::Negative));
+        assert_eq!(Ternary::from_i8(0), Some(Ternary::Neutral));
+        assert_eq!(Ternary::from_i8(1), Some(Ternary::Positive));
         assert_eq!(Ternary::from_i8(5), None);
     }
 
@@ -585,8 +581,8 @@ mod tests {
     #[test]
     fn test_cross_attention_different_lengths() {
         let ca = CrossAttention::new(4);
-        let source = vec![Ternary::Neg];
-        let target = vec![Ternary::Zero, Ternary::Pos, Ternary::Neg, Ternary::Pos];
+        let source = vec![Ternary::Negative];
+        let target = vec![Ternary::Neutral, Ternary::Positive, Ternary::Negative, Ternary::Positive];
         let (output, weights) = ca.forward(&source, &target);
         assert_eq!(output.len(), 1);
         assert_eq!(weights[0].len(), 4);

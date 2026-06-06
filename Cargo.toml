@@ -1,6 +1,9 @@
 [package]
 name = "ternary-attention"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "Attention mechanisms adapted for ternary inputs on {-1, 0, +1}"
+
+[dependencies]
+ternary-types = { git = "https://github.com/SuperInstance/ternary-types.git" }

@@ -87,3 +87,8 @@ use ternary_attention;
 ## License
 
 MIT
+![Migration](https://img.shields.io/badge/ternary_types-v0.2.0-blueviolet)
+
+## Migration
+
+This crate uses `ternary_types::Ternary` (canonical) instead of its own `enum Ternary`.

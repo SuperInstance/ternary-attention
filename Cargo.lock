@@ -4,4 +4,12 @@ version = 4
 
 [[package]]
 name = "ternary-attention"
+version = "0.2.0"
+dependencies = [
+ "ternary-types",
+]
+
+[[package]]
+name = "ternary-types"
 version = "0.1.0"
+source = "git+https://github.com/SuperInstance/ternary-types.git#a3ea305e13e2a7032bb4b58d0c32e7ef8ea49603"
