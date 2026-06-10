@@ -1,4 +1,5 @@
 [package]
+repository = "https://github.com/SuperInstance/ternary-attention"
 name = "ternary-attention"
 version = "0.2.0"
 edition = "2021"
